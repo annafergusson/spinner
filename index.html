@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link href="https://fonts.googleapis.com/css?family=Sacramento|Roboto+Slab" rel="stylesheet">
+  <style type="text/css" media="screen">
+  
+  body {
+ font-family: 'Roboto Slab', serif;
+  }
+	a.export, a.export:visited{
+    text-decoration: none;
+    color:#000;
+    background-color:#666666;
+    border: 1px solid #ccc;
+    padding:8px;
+	color: #ffffff;
+    font-family: 'Roboto Slab', serif;
+    font-size: 20pt;
+}
+
+.wrapper {
+    position: relative;
+    width: 400px;
+    height: 400px;
+}
+
+.wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#animate:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+</style>
+  </head>
+  <body>
+    <center>
+	<div class='wrapper'>
+		<canvas id="canvasBack" width='400' height='400'></canvas>
+		<canvas id="canvasFore" width='400' height='400'></canvas>
+	</div>
+	<p><a class="export" id="animate" onclick="spin('start');">Spin!</a></p>
+    </center>
+  </body>
+</html>
+<script>
+
+var angle = 0;
+var end = 0;
+setUpSpinner(angle);
+var num = 1;
+var surprise = Math.ceil(8*Math.random());
+
+function setUpSpinner()
+{
+    var canvas = document.getElementById('canvasBack');
+    var context = canvas.getContext('2d');
+    var x = canvas.width/2;
+    var y = canvas.height/2;
+    var r = canvas.width*0.4;
+    context.clearRect(0,0,canvas.width,canvas.height);
+    context.beginPath();
+    context.fillStyle = "#000080";
+    context.arc(x,y,r, 0, Math.PI,false);
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.fillStyle = "#999999";
+    context.arc(x,y,r, Math.PI, 0,false);
+    context.fill();
+    context.closePath();
+    var canvas = document.getElementById('canvasFore');
+    var context = canvas.getContext('2d');
+    drawPointer(canvas, context, x, y, r);
+}
+
+function drawPointer(canvas, context, x, y, r)
+{
+   context.clearRect(0,0,canvas.width,canvas.height);
+   context.beginPath();
+   context.fillStyle = "#ffffff";
+   context.strokeStyle ="#ffffff";
+   context.lineWidth = canvas.width/80;
+   context.save();
+   context.translate(x, y);
+   context.rotate(angle);	
+   context.translate( -x, -y);
+   context.beginPath();
+   context.moveTo(x,y);
+   context.lineTo(x,y - 0.9*r);
+   context.stroke();
+   context.closePath();
+   context.beginPath();
+   context.lineWidth = canvas.width/400;
+   context.moveTo(x - canvas.width/40, y - 0.85*r);
+   context.lineTo(x + canvas.width/40, y - 0.85*r);
+   context.lineTo(x, y - r);
+   context.lineTo(x - canvas.width/40, y - 0.85*r);
+   context.fill();
+   context.closePath();
+   context.restore();
+   context.fillStyle = "#ffffff";
+   context.beginPath();
+   context.arc(x, y, canvas.width/80, 0, 2*Math.PI,false);
+   context.fill();
+   context.closePath();
+}
+
+function spin(status)
+{
+   var canvas = document.getElementById('canvasFore');
+   var context = canvas.getContext('2d');
+   var x = canvas.width/2;
+   var y = canvas.height/2;
+   var r = canvas.width*0.4;
+   
+   if(status=='start')
+   {
+      if(num > 8)
+      {
+         //reset
+         num = 1;
+         surprise = Math.ceil(8*Math.random());
+      }
+      end = Math.ceil(angle/(2*Math.PI))*2*Math.PI + 4*Math.PI + Math.PI/2 + Math.random()*Math.PI;
+      if(num == surprise)
+      {
+         end = Math.ceil(angle/(2*Math.PI))*2*Math.PI + 4*Math.PI - Math.PI/2 + Math.random()*Math.PI;
+      }
+      num += 1;
+   }
+   
+   if(angle < end)
+   {
+       drawPointer(canvas, context, x, y, r);
+       angle += 5*Math.PI/90;
+       setTimeout(function (){spin('cont')}, 30);
+   }
+}
+
+</script>
